@@ -1,11 +1,12 @@
 import random
-import ast
-import sys
+import base64
+import zlib
+from .io import markovobj
 
 
 class Markov:
     # Init method that initializes the class variables
-    def __init__(self, size=5):
+    def __init__(self, size=3):
         self.n = size
         self.vocabulary = {}
         self.data = list()
@@ -53,6 +54,7 @@ class Markov:
         return selection
 
     # Nonprivate Functions
+    # Generation functions
     # fit: Adds data to class and parses it into NGrams, public
     def fit(self, data):
         # Usage: object.fit(List_Corpus)
@@ -70,9 +72,29 @@ class Markov:
         tempSentence = " "
         for i in listNext:
             if i == "end$":
-                return sentence + tempSentence
+                return sentence + " " + tempSentence
             elif i == "$start/":
                 pass
+            elif any(stopword in ["!", ".", "?"] for stopword in i):
+                return sentence + " " + tempSentence + " " + i
             else:
                 tempSentence = tempSentence + " " + i
         return self.formSentence(sentence=tempSentence, current=current)
+
+    # markovobj handlers
+    # unpackObj: Unpacks and loads a object of class markovobj that was pickled
+    def unpackObj(self, obj, verify=True):
+        if verify:
+            signatureString = base64.b64decode(obj.signature)
+            signatureData = signatureString.split("/".encode())
+            if str(zlib.crc32(signatureData[0])).encode() != signatureData[1]:
+                raise RuntimeWarning("Object unverified, returning")
+                return
+        self.n = obj.gramSize
+        self.data = obj.raw
+        self.vocabulary = obj.vocabulary
+        self.objSignature = obj.signature
+
+    # generateObj: Generates a markovobj from the current class with an id
+    def generateObj(self, identifier):
+        return markovobj(self, identifier)
