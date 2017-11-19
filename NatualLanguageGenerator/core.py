@@ -1,7 +1,7 @@
 import random
 import base64
 import zlib
-from .io import markovobj
+from .processing import markovobj
 
 
 class Markov:

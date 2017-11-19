@@ -2,7 +2,6 @@ import ast
 import pickle
 from NatualLanguageGenerator import io
 from NatualLanguageGenerator import core
-from chardet import detect
 # from NatualLanguageGenerator import NatualLanguageGenerator as nlg
 
 # generator = nlg.NLG(4, ["I do not like you"])
