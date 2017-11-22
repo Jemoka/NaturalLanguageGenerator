@@ -5,13 +5,13 @@
 # This could also be used as documentation
 
 # Goup 0: Importing Tests
-from NatualLanguageGenerator import core
 from NatualLanguageGenerator import io
+from NatualLanguageGenerator import markov
 
 
 # Group 1: Core Tests
-# Initializing a Core.Markov object
-coreObject = core.Markov()
+# Initializing a markov.Markov object
+coreObject = markov.Markov()
 
 # Fitting with data
 # with open("parsed.json", "r") as file:
@@ -24,14 +24,14 @@ print(coreObject.formSentence())
 
 
 # Group 2: IO and exporting Tests
-# Creating markovobj from core class
+# Creating generatorobj from core class
 mObj = coreObject.generateObj("test")
 print(mObj.vocabulary)
 
-# Exporting JSON from markovobj
+# Exporting JSON from generatorobj
 print(mObj.exportJson())
 
-# Initializing a io.fileWriter object with the markovobj
+# Initializing a io.fileWriter object with the generatorobj
 fwObj = io.fileWriter(mObj)
 
 # Writing the object to a file
@@ -44,9 +44,8 @@ fwObj.update(mObj)
 fwObj.save()
 
 # Retriving saved object
-mObjRetrived = fwObj.load(filePath="/Users/liujack/Desktop/test.markovobj")
+mObjRetrived = fwObj.load(filePath="/Users/liujack/Desktop/test.generatorobj")
 
 # Loading saved object back into a core class
-coreObject1 = core.Markov()
+coreObject1 = markov.Markov()
 coreObject1.unpackObj(mObjRetrived)
-print(coreObject1.vocabulary)

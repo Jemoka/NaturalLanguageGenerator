@@ -21,7 +21,7 @@ def to_json(data):
     raise TypeError
 
 
-class markovobj:
+class generatorobj:
     def __init__(self, coreObject, stringIdentifier):
         self.object = coreObject
         self.raw = coreObject.data

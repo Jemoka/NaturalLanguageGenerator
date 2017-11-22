@@ -1,21 +1,14 @@
-import random
 import base64
 import zlib
-from .processing import markovobj
+from .processing import generatorobj
 
 
-class Markov:
-    # Init method that initializes the class variables
-    def __init__(self, size=3):
-        self.n = size
-        self.vocabulary = {}
-        self.data = list()
-        pass
-
+class utilityFunctions(object):
     # Utility (private) methods that this class will sourced
     # __NGrams: Parses a string into dictionary of NGrams, private
-    def __NGrams(self, size, string):
-        size -= 1
+    @staticmethod
+    def NGrams(gramSize, string):
+        size = gramSize - 1
         tokens = ["$start/"] + string.split(" ") + ["end$"]
         grams = {}
         for startPos in range(0, len(tokens) - 1):
@@ -31,13 +24,13 @@ class Markov:
             try:
                 if grams.get(gram) is None:
                     nextGrams = tuple()
-                    for e in range(1, self.n + 1):
+                    for e in range(1, gramSize + 1):
                         nextGram = (tokens[startPos + size + e],)
                         nextGrams = nextGrams + nextGram
                     grams[gram] = [nextGrams]
                 else:
                     nextGrams = tuple()
-                    for e in range(1, self.n + 1):
+                    for e in range(1, gramSize + 1):
                         nextGram = (tokens[startPos + size + e],)
                         nextGrams = nextGrams + nextGram
                     grams[gram] = grams.get(gram) + [nextGrams]
@@ -45,44 +38,45 @@ class Markov:
                 grams[gram] = ""
         return grams
 
+
+class baseNLG(object):
+    # Init method that initializes the class variables
+    def __init__(self, gramSize=3):
+        self.n = gramSize
+        self.vocabulary = {}
+        self.data = list()
+        pass
+
     # __GetNext: Predicts the next set of grams from the current set
     def __GetNext(self, current=None):
-        current = self.vocabulary.get(current)
-        if not current:
-            current = self.vocabulary.keys()
-        selection = random.sample(current, 1)[0]
-        return selection
+        '''
+        Gets the next set of words based on the current set
+        Or gets the next set of words randomly to start a sentence
+        '''
+        message = "baseNLG.__GetNext not implimented"
+        raise NotImplementedError(message)
 
     # Nonprivate Functions
     # Generation functions
     # fit: Adds data to class and parses it into NGrams, public
     def fit(self, data):
-        # Usage: object.fit(List_Corpus)
-        for i in data:
-            self.data = self.data + [i]
-            grams = self.__NGrams(self.n, i)
-            self.vocabulary.update(grams)
+        '''
+        Fits the class of data for future generation needs
+        '''
+        message = "baseNLG.fit not implimented"
+        raise NotImplementedError(message)
 
     # formSentence: Forms a sentence via calling GetNext multiple times
     def formSentence(self, sentence='', current=None):
-        # Usage: object.formSentence()
-        # DO NOT PASS ANY PARAMETERS unless you know what you're doing
-        nextWords = self.__GetNext(current=current)
-        listNext = list(nextWords)
-        tempSentence = " "
-        for i in listNext:
-            if i == "end$":
-                return sentence + " " + tempSentence
-            elif i == "$start/":
-                pass
-            elif any(stopword in ["!", ".", "?"] for stopword in i):
-                return sentence + " " + tempSentence + " " + i
-            else:
-                tempSentence = tempSentence + " " + i
-        return self.formSentence(sentence=tempSentence, current=current)
+        '''
+        Forms a sentence from nothing or a current words
+        Should be recursive
+        '''
+        message = "baseNLG.formSentence not implimented"
+        raise NotImplementedError(message)
 
-    # markovobj handlers
-    # unpackObj: Unpacks and loads a object of class markovobj that was pickled
+    # generatorobj handlers
+    # unpackObj: Unpacks and loads a object of class generatorobj into class
     def unpackObj(self, obj, verify=True):
         if verify:
             signatureString = base64.b64decode(obj.signature)
@@ -95,6 +89,6 @@ class Markov:
         self.vocabulary = obj.vocabulary
         self.objSignature = obj.signature
 
-    # generateObj: Generates a markovobj from the current class with an id
+    # generateObj: Generates a generatorobj from the current class with an id
     def generateObj(self, identifier):
-        return markovobj(self, identifier)
+        return generatorobj(self, identifier)
