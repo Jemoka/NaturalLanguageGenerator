@@ -1,6 +1,7 @@
 import base64
 import zlib
 import json
+import pickle
 
 
 def key_to_json(data):
@@ -23,28 +24,23 @@ def to_json(data):
 
 class generatorobj:
     def __init__(self, coreObject, stringIdentifier):
-        self.object = coreObject
+        self.pObject = base64.b64encode(pickle.dumps(coreObject))
         self.raw = coreObject.data
-        self.vocabulary = coreObject.vocabulary
-        self.gramSize = coreObject.n
         encodedID = stringIdentifier.encode()
         identifierHash = zlib.crc32(encodedID)
         signatureString = stringIdentifier + "/" + str(identifierHash)
         self.signature = base64.b64encode(signatureString.encode())
 
     def updateObject(self, updatedCoreObject):
-        self.object = updatedCoreObject
+        self.pObject = base64.b64encode(pickle.dumps(updatedCoreObject))
         self.raw = updatedCoreObject.data
-        self.vocabulary = updatedCoreObject.vocabulary
-        self.gramSize = updatedCoreObject.n
 
     def exportJson(self):
+        coreObject = {str("pCoreObject"): str(self.pObject)}
         rawData = {str("rawData"): to_json(self.raw)}
-        vocabulary = {str("parsedData"): to_json(self.vocabulary)}
-        gramSize = {str("dataGramSize"): int(self.gramSize)}
         signature = {str("signature"): self.signature.decode()}
         data = {}
-        dicts = [rawData, vocabulary, gramSize, signature]
+        dicts = [coreObject, rawData, signature]
         for d in dicts:
             data.update(d)
         return json.dumps(data)

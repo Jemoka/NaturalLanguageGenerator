@@ -1,10 +1,28 @@
 import base64
 import zlib
+import pickle
 from .processing import generatorobj
 
 
 class utilityFunctions(object):
     # Utility (private) methods that this class will sourced
+    # verifyObject: Verifies the signature of an object
+    @staticmethod
+    def verifyObject(obj):
+        signatureString = base64.b64decode(obj.signature)
+        signatureData = signatureString.split("/".encode())
+        if str(zlib.crc32(signatureData[0])).encode() != signatureData[1]:
+            # raise RuntimeWarning("Object unverified")
+            return 1
+        else:
+            return 0
+
+    # decodeObject: Turns a base64 string of an object to orignal form
+    @staticmethod
+    def decodeObject(stringObj):
+        byteString = base64.b64decode(stringObj)
+        return pickle.loads(byteString)
+
     # __NGrams: Parses a string into dictionary of NGrams, private
     @staticmethod
     def NGrams(gramSize, string):
@@ -78,16 +96,11 @@ class baseNLG(object):
     # generatorobj handlers
     # unpackObj: Unpacks and loads a object of class generatorobj into class
     def unpackObj(self, obj, verify=True):
-        if verify:
-            signatureString = base64.b64decode(obj.signature)
-            signatureData = signatureString.split("/".encode())
-            if str(zlib.crc32(signatureData[0])).encode() != signatureData[1]:
-                raise RuntimeWarning("Object unverified, returning")
-                return
-        self.n = obj.gramSize
-        self.data = obj.raw
-        self.vocabulary = obj.vocabulary
-        self.objSignature = obj.signature
+        '''
+        Unpacks generatorObj that was depickled, optionally verifying it
+        '''
+        message = "baseNLG.unpackObj not implimented"
+        raise NotImplementedError(message)
 
     # generateObj: Generates a generatorobj from the current class with an id
     def generateObj(self, identifier):

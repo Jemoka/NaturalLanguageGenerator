@@ -39,3 +39,19 @@ class Markov(baseNLG):
             else:
                 tempSentence = tempSentence + " " + i
         return self.formSentence(sentence=tempSentence, current=current)
+
+    # generatorobj handlers
+    # unpackObj: Unpacks and loads a object of class generatorobj into class
+    def unpackObj(self, obj, verify=True):
+        if verify:
+            if utilityFunctions.verifyObject(obj) != 0:
+                raise RuntimeError("Object recived not verified")
+        mObject = utilityFunctions.decodeObject(obj.pObject)
+        try:
+            self.n = mObject.n
+            self.data = mObject.data
+            self.vocabulary = mObject.vocabulary
+            self.objSignature = obj.signature
+        except AttributeError:
+            message = "Object given is not object of class Markov"
+            raise AttributeError(message)
