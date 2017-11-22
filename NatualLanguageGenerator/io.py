@@ -14,7 +14,7 @@ class fileWriter:
             else:
                 raise ValueError("Please supply a directory and file name")
         else:
-            path = os.path.join(directory, filename + "." + "markovobj")
+            path = os.path.join(directory, filename + "." + "generatorobj")
         with open(path, 'wb') as dataFile:
             pickle.dump(self.object, dataFile, pickle.HIGHEST_PROTOCOL)
         self.path = path
