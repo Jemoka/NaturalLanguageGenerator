@@ -9,4 +9,5 @@ processing.py -- Handles all of the data storage, processing and analysis
 
 Engines:
 markov.py -- Markov chain implimentation
+countRanker.py -- A PageRank-like algorithm implimentation (see CountRating.md)
 """
