@@ -1,6 +1,6 @@
 # NaturalLanguageGenerator
 *A Natural Language Generator based on the Markov Chain*
-This project was written for the Hillview Middle School STEM Fair and/or the San Mateo County STEM Fair, licensed under the GNU General Public License v3.0. Please open LICENSE for more legal information. This is not a legal document.
+This project was written for the Hillview Middle School STEM Fair and/or the San Mateo County STEM Fair, licensed under the GNU Lesser General Public License v3.0. Please open LICENSE for more legal information. This is not a legal document.
 
 ## The Natural Language Generator
 The Natural Language Generator is an extendable NLP Class based on the Markov Memoryless Principle -- where the future state is only based on the current state of an object, hence memoryless -- developed by Andrey Markov. The Natural Language Generator ("The Generator") is made based on the same principle, inferring words based on the current state of the text.
