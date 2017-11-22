@@ -1,5 +1,5 @@
 # NaturalLanguageGenerator
-This project was written for the Hillview Middle School STEM Fair and/or the San Mateo County STEM Fair, licensed under the GNU General Public License v3.0. Please open LICENSE for more legal information. This is not a legal document.
+This project was written for the Hillview Middle School STEM Fair and/or the San Mateo County STEM Fair, licensed under the GNU Lesser General Public License v3.0. Please open LICENSE for more legal information. This is not a legal document.
 
 ## The Natural Language Generator
 The Natural Language Generator is an extendable NLP Class that is currently able to work with different algorithms to generate natural text. The package works with a simple Markov Chain right out of the box along with many more to come. It is also easy to be extended to (see ##Extensibility for more info) for any future projects.
