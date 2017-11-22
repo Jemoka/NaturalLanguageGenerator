@@ -1,5 +1,4 @@
 # NaturalLanguageGenerator
-*A Natural Language Generator based on the Markov Chain*
 This project was written for the Hillview Middle School STEM Fair and/or the San Mateo County STEM Fair, licensed under the GNU General Public License v3.0. Please open LICENSE for more legal information. This is not a legal document.
 
 ## The Natural Language Generator

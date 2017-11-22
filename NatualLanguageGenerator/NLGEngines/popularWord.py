@@ -1,9 +1,9 @@
 import random
 import operator
 import ast
-from .core import baseNLG
-from .core import utilityFunctions
-from .processing import generatorobj
+from NatualLanguageGenerator.core import baseNLG
+from NatualLanguageGenerator.core import utilityFunctions
+from NatualLanguageGenerator.processing import generatorobj
 
 with open("parsed.json", "r") as file:
     corpus = ast.literal_eval(file.read())
@@ -94,7 +94,6 @@ class PopularWord(baseNLG):
         mObject = utilityFunctions.decodeObject(obj.pObject)
         try:
             self.raw = mObject.raw
-            self.refrences = mObject.refrences
             self.vocabulary = mObject.vocabulary
             self.data = mObject.data
             self.countRank = mObject.countRank

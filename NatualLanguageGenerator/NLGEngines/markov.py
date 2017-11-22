@@ -1,6 +1,6 @@
 import random
-from .core import baseNLG
-from .core import utilityFunctions
+from NatualLanguageGenerator.core import baseNLG
+from NatualLanguageGenerator.core import utilityFunctions
 
 
 class Markov(baseNLG):

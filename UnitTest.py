@@ -6,7 +6,7 @@
 
 # Goup 0: Importing Tests
 from NatualLanguageGenerator import io
-from NatualLanguageGenerator import popularWord
+from NatualLanguageGenerator.NLGEngines import popularWord
 import ast
 
 
