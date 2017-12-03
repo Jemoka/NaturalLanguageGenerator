@@ -5,7 +5,7 @@ from nltk import word_tokenize
 from nltk import RegexpTokenizer
 from nltk import RegexpParser
 from nltk.draw.util import CanvasFrame
-from nltk.draw import TreeWidget
+from nltk.draw.tree import TreeView
 from nltk import pos_tag
 from nltk import Text
 from nltk import Tree
@@ -52,15 +52,24 @@ def treeIfy(taggedSentence):
     # {<JJ>*<NN><CC>*<NN>+}
     # {<JJ>*<NN|NNS>+}      PP: {<IN><DT>?<NP>}
     grammar = """
-    LIST: {(<JJ>*<NN|NNS><,>?)+(<CC><JJ>*<NN|NNS>)}
-    NP: {<DT>?<JJ>*<NN|NNS>+}
-    {<DT>?<JJ>*<NN><CC>*<NN>+}
-    {<DT>?<JJ>* <NN.*>+ <IN>?}
-    {<DT>?<JJ>* <NN.*>+ <IN>?}
+    LIST:
+    {(<JJ>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS><,>?)+(<CC><JJ>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS>)}
+    INF:
+    {<TO><VB|VBG|VBD|VBN|VBP|VBZ>}
+    NP:
+    {<DT>?<JJ>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS>+}
+    {<DT>?<JJ>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS><CC>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS>+}
+    {<DT>?<JJ>* <PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS.*>+ <IN>?}
+    {<DT>?<JJ>* <PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS.*>+ <IN>?}
     {<DT>?<JJ>* <LIST>+}
-    PP: {<IN><NP>}
-    VP: {<VB|VBG|VBD|VBN|VBP|VBZ><.*>*}
+    VP:
+    {<VB|VBG|VBD|VBN|VBP|VBZ><.*>*}
     }<.>{
+    }<CC><.*>*{
+    PP:
+    {<IN><NP>}
+    COMPOUND:
+    {<.*>*<CC><.*>*}
     """
     NPChunker = RegexpParser(grammar)
     return NPChunker.parse(taggedSentence)
@@ -114,8 +123,8 @@ def reduceLevel(array):
 # print(multiSplit(textData, reduceLevel(fuzzyFind(PoS, "VB"))))
 # print(tree2dict(treeIfy(correctParticles(pos_tag(text))))["S"])
 # json.dump(tree2dict(treeIfy(correctParticles(pos_tag(text)))), sys.stdout, indent=2)
-
-etiquette_excerpt = "I like jack, but I am a good guy."
+etiquette_excerpt = "Jack and Jill went up a hill to fetch a pale of water."
 tokens = word_tokenize(etiquette_excerpt.lower())
-treeData = tree2dict(treeIfy(pos_tag(tokens)))
-json.dump(treeData, sys.stdout, indent=2)
+treeData = treeIfy(pos_tag(tokens))
+json.dump(tree2dict(treeData), sys.stdout, indent=2)
+TreeView(treeData)._cframe.print_to_file('/Users/liujack/Desktop/output.ps')
