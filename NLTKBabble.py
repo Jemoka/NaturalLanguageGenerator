@@ -4,6 +4,7 @@ from nltk.tag.stanford import StanfordPOSTagger
 from nltk import chunk
 from nltk.chunk.util import tagstr2tree
 from nltk import word_tokenize
+from nltk.tokenize import sent_tokenize
 from nltk import RegexpTokenizer
 from nltk import RegexpParser
 from nltk.draw.util import CanvasFrame
@@ -83,7 +84,10 @@ class SentenceTrees(object):
         data = array
         modifiers = {}
         for key, value in data:
-            index = data.index((key, value))
+            try:
+                index = data.index((key, value))
+            except ValueError:
+                pass
             if any(value==s for s in ["JJ", "RB", "DT"]):
                 try:
                     searchArray = [["RB","RB"], ["JJ", "NN"], ["RB", "JJ"], ["JJ", "JJ"], ["RB", "RB"], ["JJ", "NNS"], ["JJ", "NNP"], ["JJ", "NNPS"]]
@@ -152,13 +156,15 @@ class SentenceTrees(object):
             obj = ''
             for e in useObj:
                 obj = obj+" "+e
-            print(useSbj, verb, useObj)
             return sbj+" "+verb+obj+"."
 
 
 s = SentenceTrees()
 t0 = time.time()
-s.train(["Susan taught me English on Sunday.", "The quick brown fox jumped over the lazy dog and funny cat."])
+philosophy = """
+Historically, "philosophy" encompassed any body of knowledge. From the time of Ancient Greek philosopher Aristotle to the 19th century, "natural philosophy" encompassed astronomy, medicine, and physics. For example, Newton's 1687 Mathematical Principles of Natural Philosophy later became classified as a book of physics. In the 19th century, the growth of modern research universities led academic philosophy and other disciplines to professionalize and specialize. In the modern era, some investigations that were traditionally part of philosophy became separate academic disciplines, including psychology, sociology, linguistics, and economics.
+"""
+s.train(sent_tokenize(philosophy))
 t1 = time.time()
 print(t1-t0)
 t0 = time.time()
