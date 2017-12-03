@@ -62,10 +62,10 @@ def treeIfy(taggedSentence):
     INF:
     {<TO><VB|VBG|VBD|VBN|VBP|VBZ>}
     NP:
-    {<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS>+<.*>*}
+    {<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS|LS>+<.*>*}
     {<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS><CC>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS>+}
-    {<DT>?<RB>*<JJ>* <PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS.*>+ <IN>?}
-    {<DT>?<RB>*<JJ>* <PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS.*>+ <IN>?}
+    {<DT>?<RB>*<JJ>* <PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS|LS.*>+ <IN>?}
+    {<DT>?<RB>*<JJ>* <PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS|LS.*>+ <IN>?}
     {<DT>?<RB>*<JJ>* <LIST>+}
     }<,>{
     }<RB>*<VB|VBG|VBD|VBN|VBP|VBZ>{
@@ -140,32 +140,34 @@ def findVerb(array):
     for i in array:
         if type(i) != tuple:
             pass
-        if "VB" in i[1]:
-            return i[0]
+        if any(i[1] in s for s in ["VB", "VBG", "VBP", "VBD", "VBD", "VBN", "VBZ"]):
+            return (i[0], i[1])
+    return 0
+
+def simplify(array):
+    data = array
+    for key, value in data:
+        if any(value==s for s in ["JJ", "RB", "DT"]):
+            data = [x for x in data if x != (key, value)]
+    return data
 
 
-def strip(treeDict):
-    pass
-
-# textData = "My sentence is quite long, so you might have to hurry up"
-# tokens = word_tokenize(textData.lower())
-# text = Text(tokens)
-# print(correctParticles(pos_tag(text)))
-# PoS = dictIfy(correctParticles(pos_tag(text)))
-# print(PoS)
-# print(fuzzyFind(PoS, "VB"))
-# print(reduceLevel(fuzzyFind(PoS, "VB")))
-# print(multiSplit(textData, reduceLevel(fuzzyFind(PoS, "VB"))))
-# print(tree2dict(treeIfy(correctParticles(pos_tag(text))))["S"])
-# json.dump(tree2dict(treeIfy(correctParticles(pos_tag(text)))), sys.stdout, indent=2)
+def strip(tree):
+    NP = findNode(tree, "NP")
+    VB = findVerb(reduceLevel(findNode(tree, "VP")))
+    print(NP, VB)
+    sNP = []
+    for i in NP:
+        sNP.append(simplify(i))
+    print(sNP, VB)
 
 
 tagger = StanfordPOSTagger('StanfordTagger/models/english-bidirectional-distsim.tagger', 'StanfordTagger/stanford-postagger.jar')
-etiquette_excerpt = "The quick brown fox jumped over the lazy dog"
+etiquette_excerpt = "On Wendsdays, Susan comes to teach me English."
 tokens = word_tokenize(etiquette_excerpt.lower())
 treeData = treeIfy(tagger.tag(tokens))
 print(treeData)
 json.dump(tree2dict(treeData), sys.stdout, indent=2)
 TreeView(treeData)._cframe.print_to_file('/Users/liujack/Desktop/output.ps')
 treeDict = tree2dict(treeData)
-print(findNode(treeData, "NP"))
+print(strip(treeData))
