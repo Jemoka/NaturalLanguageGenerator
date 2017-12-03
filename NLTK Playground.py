@@ -1,4 +1,5 @@
 from nltk.corpus import treebank
+from nltk.corpus import wordnet as wn
 from nltk import BigramTagger
 from nltk import UnigramTagger
 from nltk import TrigramTagger
@@ -14,9 +15,11 @@ from nltk.draw.tree import TreeView
 from nltk import pos_tag
 from nltk import Text
 from nltk import Tree
+from nltk import CFG
 import json
 import re
 import sys
+import random
 
 
 def makeString(words):
@@ -58,19 +61,22 @@ def treeIfy(taggedSentence):
     # {<JJ>*<NN|NNS>+}      PP: {<IN><DT>?<NP>}
     grammar = """
     LIST:
-    {(<JJ>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS><,>?)+(<CC><JJ>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS>)}
+    {(<JJ>*<PRP|PRP$|WP|WP$|NN.*|JJ|RB><,>?)+(<CC><JJ>*<PRP|PRP$|WP|WP$|NN.*|JJ|RB>)}
+    NRC:
+    {<,><WDT><.*>*<,>}
     INF:
     {<TO><VB|VBG|VBD|VBN|VBP|VBZ>}
     NP:
-    {<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS|LS>+<.*>*}
-    {<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS><CC>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS>+}
-    {<DT>?<RB>*<JJ>* <PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS|LS.*>+ <IN>?}
-    {<DT>?<RB>*<JJ>* <PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS|LS.*>+ <IN>?}
-    {<DT>?<RB>*<JJ>* <LIST>+}
+    {<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS>+<.*>*}
+    {<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*><CC>*<PRP|PRP$|WP|WP$|NN.*>+}
+    {<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS.*>+ <IN>?}
+    {<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS.*>+ <IN>?}
+    {<DT>?<RB>*<JJ>*<LIST>+}
     }<,>{
-    }<RB>*<VB|VBG|VBD|VBN|VBP|VBZ>{
+    }<.>{
+    }<RB>*<VB.*>{
     VP:
-    {<RB>*<VB|VBG|VBD|VBN|VBP|VBZ><.*>*}
+    {<RB>*<VB.*><.*>*}
     }<.>{
     PP:
     {<IN><NP>}
@@ -146,28 +152,85 @@ def findVerb(array):
 
 def simplify(array):
     data = array
+    modifiers = {}
     for key, value in data:
+        index = data.index((key, value))
         if any(value==s for s in ["JJ", "RB", "DT"]):
+            try:
+                searchArray = [["RB","RB"], ["JJ", "NN"], ["RB", "JJ"], ["JJ", "JJ"], ["RB", "RB"], ["JJ", "NNS"], ["JJ", "NNP"], ["JJ", "NNPS"]]
+                if any([value, data[index+1][1]]==e for e in searchArray):
+                    newd = {data[index+1]: (key, value)}
+                    modifiers.update(newd)
+            except IndexError:
+                pass
             data = [x for x in data if x != (key, value)]
-    return data
+    return (data, modifiers)
 
 
-def strip(tree):
+def parse(tree):
+    print(tree)
     NP = findNode(tree, "NP")
     VB = findVerb(reduceLevel(findNode(tree, "VP")))
-    print(NP, VB)
     sNP = []
+    mod = {}
     for i in NP:
-        sNP.append(simplify(i))
-    print(sNP, VB)
+        sNP.append(simplify(i)[0])
+        mod.update(simplify(i)[1])
+    nouns = []
+    for i in sNP:
+        nl = []
+        for key, value in i:
+            nl.append(key)
+        nouns.append(nl)
 
+    n = {"SBJ": nouns[0], "OBJ": nouns[1]}
+    verb = wn.synsets(VB[0])[0].lemmas()[0].name()
+    modifiers = {}
+    for key, value in mod.items():
+        modifiers.update({key[0]:value[0]})
+    return n, verb, modifiers
+
+def update(dictionary, key, value):
+    if dictionary.get(key) is None:
+        dictionary[key] = [value]
+    else:
+        dictionary[key] = [dictionary.get(key)] + [value]
 
 tagger = StanfordPOSTagger('StanfordTagger/models/english-bidirectional-distsim.tagger', 'StanfordTagger/stanford-postagger.jar')
-etiquette_excerpt = "On Wendsdays, Susan comes to teach me English."
+etiquette_excerpt = "The quick brown fox jumped over the lazy dog and funny cat."
 tokens = word_tokenize(etiquette_excerpt.lower())
 treeData = treeIfy(tagger.tag(tokens))
-print(treeData)
 json.dump(tree2dict(treeData), sys.stdout, indent=2)
-TreeView(treeData)._cframe.print_to_file('/Users/liujack/Desktop/output.ps')
+print("\n")
+# TreeView(treeData)._cframe.print_to_file('/Users/liujack/Desktop/output.ps')
 treeDict = tree2dict(treeData)
-print(strip(treeData))
+nouns, verb, mods = parse(treeData)
+
+baseSentenceComponents = nouns
+print({verb:nouns})
+baseSentences = {verb:nouns}
+modifiers = mods
+verbs = [verb]
+
+etiquette_excerpt = "Susan taught me English on Sunday."
+tokens = word_tokenize(etiquette_excerpt.lower())
+treeData = treeIfy(tagger.tag(tokens))
+json.dump(tree2dict(treeData), sys.stdout, indent=2)
+print("\n")
+treeDict = tree2dict(treeData)
+nouns, verb, mods = parse(treeData)
+
+update(baseSentenceComponents, "SBJ", nouns["SBJ"])
+update(baseSentenceComponents, "OBJ", nouns["OBJ"])
+update(baseSentences, verb, nouns)
+for key, value in mods.items():
+    update(modifiers, key, value)
+verbs = verbs + [verb]
+
+print(baseSentenceComponents, baseSentences, modifiers, verbs)
+
+useVerb = random.sample(verbs, 1)[0]
+useSbj = random.sample(baseSentenceComponents["SBJ"], 1)[0]
+useObj = random.sample(baseSentenceComponents["OBJ"], 1)[0]
+NP = baseSentences[useVerb]
+print(useSbj, useVerb, useObj)
