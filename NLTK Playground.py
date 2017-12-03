@@ -1,4 +1,9 @@
 from nltk.corpus import treebank
+from nltk import BigramTagger
+from nltk import UnigramTagger
+from nltk import TrigramTagger
+from nltk import DefaultTagger
+from nltk.tag.stanford import StanfordPOSTagger
 from nltk import chunk
 from nltk.chunk.util import tagstr2tree
 from nltk import word_tokenize
@@ -57,28 +62,29 @@ def treeIfy(taggedSentence):
     INF:
     {<TO><VB|VBG|VBD|VBN|VBP|VBZ>}
     NP:
-    {<DT>?<JJ>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS>+}
-    {<DT>?<JJ>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS><CC>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS>+}
-    {<DT>?<JJ>* <PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS.*>+ <IN>?}
-    {<DT>?<JJ>* <PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS.*>+ <IN>?}
-    {<DT>?<JJ>* <LIST>+}
+    {<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS>+<.*>*}
+    {<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS><CC>*<PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS>+}
+    {<DT>?<RB>*<JJ>* <PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS.*>+ <IN>?}
+    {<DT>?<RB>*<JJ>* <PRP|PRP$|WP|WP$|NN|NNS|NNP|NNPS.*>+ <IN>?}
+    {<DT>?<RB>*<JJ>* <LIST>+}
+    }<,>{
+    }<RB>*<VB|VBG|VBD|VBN|VBP|VBZ>{
     VP:
-    {<VB|VBG|VBD|VBN|VBP|VBZ><.*>*}
+    {<RB>*<VB|VBG|VBD|VBN|VBP|VBZ><.*>*}
     }<.>{
-    }<CC><.*>*{
     PP:
     {<IN><NP>}
-    COMPOUND:
-    {<.*>*<CC><.*>*}
+    }<,>{
     """
     NPChunker = RegexpParser(grammar)
     return NPChunker.parse(taggedSentence)
 
 
-def dictIfy(tuple):
+def dictIfy(tuples):
     ds = []
-    for x, y in tuple:
-        ds.append({y: x})
+    for i in tuples:
+        tupleList = list(i)
+        ds.append({tupleList[1]: tupleList[0]})
     return join(ds)
 
 
@@ -112,6 +118,35 @@ def reduceLevel(array):
     return output
 
 
+def findVP(sentence, index=0):
+    VP = sentence[index]
+    currentIndex = index
+    while type(VP) != dict:
+        VP = findVP(sentence, index=currentIndex + 1)
+    while VP.get("VP") is None:
+        VP = findVP(sentence, index=currentIndex + 1)
+    return VP
+
+
+def findNode(tree, nodeName):
+    leaves = []
+    for subtree in tree.subtrees():
+        if subtree.label() == nodeName:
+            leaves.append(subtree.leaves())
+    return leaves
+
+
+def findVerb(array):
+    for i in array:
+        if type(i) != tuple:
+            pass
+        if "VB" in i[1]:
+            return i[0]
+
+
+def strip(treeDict):
+    pass
+
 # textData = "My sentence is quite long, so you might have to hurry up"
 # tokens = word_tokenize(textData.lower())
 # text = Text(tokens)
@@ -123,8 +158,14 @@ def reduceLevel(array):
 # print(multiSplit(textData, reduceLevel(fuzzyFind(PoS, "VB"))))
 # print(tree2dict(treeIfy(correctParticles(pos_tag(text))))["S"])
 # json.dump(tree2dict(treeIfy(correctParticles(pos_tag(text)))), sys.stdout, indent=2)
-etiquette_excerpt = "Jack and Jill went up a hill to fetch a pale of water."
+
+
+tagger = StanfordPOSTagger('StanfordTagger/models/english-bidirectional-distsim.tagger', 'StanfordTagger/stanford-postagger.jar')
+etiquette_excerpt = "The quick brown fox jumped over the lazy dog"
 tokens = word_tokenize(etiquette_excerpt.lower())
-treeData = treeIfy(pos_tag(tokens))
+treeData = treeIfy(tagger.tag(tokens))
+print(treeData)
 json.dump(tree2dict(treeData), sys.stdout, indent=2)
 TreeView(treeData)._cframe.print_to_file('/Users/liujack/Desktop/output.ps')
+treeDict = tree2dict(treeData)
+print(findNode(treeData, "NP"))
