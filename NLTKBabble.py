@@ -13,11 +13,14 @@ from nltk import pos_tag
 from nltk import Text
 from nltk import Tree
 from nltk import CFG
+import progressbar
 import json
 import re
 import sys
 import random
 import time
+import pickle
+import ast
 
 class SentenceTrees(object):
     def __init__(self, treeGrammar=None, taggerDir=['StanfordTagger/models/english-bidirectional-distsim.tagger', 'StanfordTagger/stanford-postagger.jar']):
@@ -114,8 +117,17 @@ class SentenceTrees(object):
             for key, value in i:
                 nl.append(key)
             nouns.append(nl)
-        n = {"SBJ": nouns[0], "OBJ": nouns[1]}
-        verb = wn.synsets(VB[0])[0].lemmas()[0].name()
+        try:
+            n = {"SBJ": nouns[0], "OBJ": nouns[1]}
+        except IndexError:
+            return None
+        try:
+            verb = wn.synsets(VB[0])[0].lemmas()[0].name()
+        except (TypeError, IndexError):
+            if VB == 0:
+                verb = "??"
+            else:
+                verb = str(VB[0])
         modifiers = {}
         for key, value in mod.items():
             modifiers.update({key[0]:value[0]})
@@ -133,18 +145,26 @@ class SentenceTrees(object):
             dictionary[key] = dictionary.get(key) + [value]
 
     def train(self, data):
-        for sentence in data:
+        print("Initializing training cycle for target...")
+        loss = 0
+        bar = progressbar.ProgressBar()
+        print("Training in progress...")
+        for sentence in bar(data):
             tokens = word_tokenize(sentence.lower())
             sentenceTree = self.__treeIfy(self.tagger.tag(tokens))
             self.trees.append(sentenceTree)
-            nouns, verb, mods = self.__parse(sentenceTree)
-            self.__update(self.bSentCpnts, "SBJ", nouns["SBJ"])
-            self.__update(self.bSentCpnts, "OBJ", nouns["OBJ"])
-            self.__update(self.bSents, verb, nouns)
-            for key, value in mods.items():
-                self.__update(self.mods, key, value)
-            self.vbList = self.vbList + [verb]
-
+            if self.__parse(sentenceTree) is None:
+                loss += 1
+                pass
+            else:
+                nouns, verb, mods = self.__parse(sentenceTree)
+                self.__update(self.bSentCpnts, "SBJ", nouns["SBJ"])
+                self.__update(self.bSentCpnts, "OBJ", nouns["OBJ"])
+                self.__update(self.bSents, verb, nouns)
+                for key, value in mods.items():
+                    self.__update(self.mods, key, value)
+                    self.vbList = self.vbList + [verb]
+        print("Training target finished, dataCount =",len(data),"dataloss =", loss)
     def formSentence(self):
             verb = random.sample(self.vbList, 1)[0]
             useSbj = random.sample(self.bSentCpnts["SBJ"], 1)[0]
@@ -159,15 +179,27 @@ class SentenceTrees(object):
             return sbj+" "+verb+obj+"."
 
 
+print("Welcome to SentenceTrees version 0.0.3.2")
+print("Loading dataset...")
+with open('parsed.json', 'r') as corpusFile:
+    dataDict = ast.literal_eval(corpusFile.read())
+    data = list(dataDict.keys())+list(dataDict.values())
+corpus = [i.encode('ascii', 'ignore').decode('ascii') for i in data]
+print("Training...")
 s = SentenceTrees()
 t0 = time.time()
-philosophy = """
-Historically, "philosophy" encompassed any body of knowledge. From the time of Ancient Greek philosopher Aristotle to the 19th century, "natural philosophy" encompassed astronomy, medicine, and physics. For example, Newton's 1687 Mathematical Principles of Natural Philosophy later became classified as a book of physics. In the 19th century, the growth of modern research universities led academic philosophy and other disciplines to professionalize and specialize. In the modern era, some investigations that were traditionally part of philosophy became separate academic disciplines, including psychology, sociology, linguistics, and economics.
-"""
-s.train(sent_tokenize(philosophy))
+s.train(corpus)
 t1 = time.time()
 print(t1-t0)
+print("Pickling...")
 t0 = time.time()
-print(s.formSentence())
+with open('trainedObjects/philosophy.pkl', 'wb') as output:
+    pickle.dump(s, output, pickle.HIGHEST_PROTOCOL)
+t1 = time.time()
+print(t1-t0)
+print("Forming 100 sentences...")
+t0 = time.time()
+for i in range(0,100):
+    print(s.formSentence(), end="")
 t1 = time.time()
 print(t1-t0)
