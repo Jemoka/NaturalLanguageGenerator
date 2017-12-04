@@ -123,6 +123,8 @@ class SentenceTrees(object):
             return None
         try:
             verb = wn.synsets(VB[0])[0].lemmas()[0].name()
+            if verb == "be":
+                verb = str(VB[0])
         except (TypeError, IndexError):
             if VB == 0:
                 verb = "??"
@@ -179,7 +181,7 @@ class SentenceTrees(object):
             return sbj+" "+verb+obj+"."
 
 
-print("Welcome to SentenceTrees version 0.0.3.2")
+print("Welcome to SentenceTrees version 0.0.4")
 print("Loading dataset...")
 with open('parsed.json', 'r') as corpusFile:
     dataDict = ast.literal_eval(corpusFile.read())
@@ -193,7 +195,7 @@ t1 = time.time()
 print(t1-t0)
 print("Pickling...")
 t0 = time.time()
-with open('trainedObjects/philosophy.pkl', 'wb') as output:
+with open('trainedObjects/studentCorpus.pkl', 'wb') as output:
     pickle.dump(s, output, pickle.HIGHEST_PROTOCOL)
 t1 = time.time()
 print(t1-t0)
