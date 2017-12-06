@@ -1,0 +1,26 @@
+LIST:
+{(<JJ>*<PRP|PRP$|WP|WP$|NN.*|JJ|RB><,>?)+(<CC><JJ>*<PRP|PRP$|WP|WP$|NN.*|JJ|RB>)}
+NRC:
+{<,><WDT><.*>*<,>}
+INF:
+{<TO><VB|VBG|VBD|VBN|VBP|VBZ>}
+PP:
+{<IN><DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS>+<.*>*}
+{<IN><DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*><CC>*<PRP|PRP$|WP|WP$|NN.*>+}
+{<IN><DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS.*>+ <IN>?}
+{<IN><DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS.*>+ <IN>?}
+{<IN><DT>?<RB>*<JJ>*<LIST>+}
+}<,>{
+}<.>{
+NP:
+{<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS>+<.*>*}
+{<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*><CC>*<PRP|PRP$|WP|WP$|NN.*>+}
+{<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS.*>+ <IN>?}
+{<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS.*>+ <IN>?}
+{<DT>?<RB>*<JJ>*<LIST>+}
+}<,>{
+}<.>{
+}<RB>*<VB.*>{
+VP:
+{<RB>*<VB.*><.*>*}
+}<.>{
