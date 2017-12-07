@@ -35,7 +35,7 @@ class SentenceTrees(object):
     def __init__(self, treeGrammar=None, taggerDir=['StanfordTagger/models/english-bidirectional-distsim.tagger', 'StanfordTagger/stanford-postagger.jar']):
         self.tagger = StanfordPOSTagger(taggerDir[0], taggerDir[1])
         if treeGrammar is None or type(treeGrammar) != str:
-            with open ("grammar.regexp", "r") as grammar:
+            with open ("grammar.exp.regexp", "r") as grammar:
                 self.grammar = grammar.read()
         else:
             self.grammar = treeGrammar
@@ -227,7 +227,7 @@ if mode == "-r":
     t1 = time.time()
     print("Time spent:",t1-t0)
     finish = time.time()
-    print("Job finished, total time spent", finish-start)
+    print("Session finished, total time spent", finish-start)
 
 elif sys.argv[1] == "-t":
     t0 = time.time()
@@ -261,36 +261,90 @@ elif sys.argv[1] == "-t":
     t1 = time.time()
     print("Time spent:",t1-t0)
     finish = time.time()
-    print("Job finished, total time spent", finish-start)
+    print("Session finished, total time spent", finish-start)
 
 elif sys.argv[1] == "-eval":
-    print("Welcome to SentenceTrees-EVAL Suite version 0~Alpha")
-    mode = input("MODE=")
-    if mode == "tree":
-        sentence = input("Supply a sentence: ")
-        print("You supplied "+sentence)
-        print("Initializing object and tagger...")
-        t0 = time.time()
-        s = SentenceTrees()
-        tagger = StanfordPOSTagger('StanfordTagger/models/english-bidirectional-distsim.tagger', 'StanfordTagger/stanford-postagger.jar')
-        t1 = time.time()
-        print("Time spent:",t1-t0)
-        print("Forming sentence tree...")
-        t0 = time.time()
-        treeData = s._SentenceTrees__treeIfy(tagger.tag(word_tokenize(sentence)))
-        t1 = time.time()
-        print("Time spent:",t1-t0)
-        t0 = time.time()
-        print("Starting graph mainloop...")
-        treeData.draw()
-        t1 = time.time()
-        print("Time spent:",t1-t0)
-        finish = time.time()
-        print("Job finished, total time spent", finish-start)
+    print("Welcome to SentenceTrees EVAL Tools version 0.1~Alpha")
+    mode = ""
+    while mode != "0":
+        print("""
+        ~EVAL Tools~
 
-    else:
-        print("Invalid mode supplied.")
-        sys.exit()
+        1 - Form Sentence Tree
+        2 - Edit Grammar
+        3 - Pkl Obj Variable Return
+
+        0 - Exit EVAL Tools
+
+        """)
+
+        mode = input("CHOICE: ")
+        if mode == "1":
+            sentence = input("Supply a sentence: ")
+            print("You supplied "+sentence)
+            print("Initializing object and tagger...")
+            t0 = time.time()
+            s = SentenceTrees()
+            tagger = StanfordPOSTagger('StanfordTagger/models/english-bidirectional-distsim.tagger', 'StanfordTagger/stanford-postagger.jar')
+            t1 = time.time()
+            print("Time spent:",t1-t0)
+            print("Forming sentence tree...")
+            t0 = time.time()
+            treeData = s._SentenceTrees__treeIfy(tagger.tag(word_tokenize(sentence)))
+            t1 = time.time()
+            print("Time spent:",t1-t0)
+            t0 = time.time()
+            print("Starting graph mainloop...")
+            treeData.draw()
+            print("Mainloop finished.")
+            t1 = time.time()
+            print("Time spent:",t1-t0)
+
+        elif mode == "2":
+            t0 = time.time()
+            os.system("open "+"grammar.exp.regexp")
+            t1 = time.time()
+            print("Time spent:",t1-t0)
+
+        elif mode == "3":
+            path = input("Object .pkl Directory: ")
+            t0 = time.time()
+            print("Loading file...")
+            with open(path.strip(), "rb") as DF:
+                obj = pickle.loads(DF.read())
+            t1 = time.time()
+            print("Time spent:",t1-t0)
+            t0 = time.time()
+            print("Loading variables...")
+            time.sleep(1)
+            print("\n")
+            print("obj.trees:", obj.trees)
+            time.sleep(1)
+            print("\n")
+            print("obj.vblist:", obj.vbList)
+            time.sleep(1)
+            print("\n")
+            print("obj.bSentCpnts:", obj.bSentCpnts)
+            time.sleep(1)
+            print("\n")
+            print("obj.bSents:", obj.bSents)
+            time.sleep(1)
+            print("\n")
+            print("obj.mods:", obj.mods)
+            time.sleep(1)
+            print("\n")
+            t1 = time.time()
+            print("Time spent:",t1-t0)
+
+        elif mode == "0":
+            print("Quitting...")
+
+        else:
+            print("Invalid mode supplied.")
+
+    finish = time.time()
+    print("Session finished, total time spent", finish-start)
+    sys.exit()
 
 else:
     print("Invalid handle supplied.")

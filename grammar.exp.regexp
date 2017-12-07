@@ -2,6 +2,13 @@ INF:
 {<TO><VB>}
 LIST:
 {(<JJ>*<PRP|PRP$|WP|WP$|NN.*|JJ|RB><,>?)+(<CC><JJ>*<PRP|PRP$|WP|WP$|NN.*|JJ|RB>)}
+PP:
+{<IN><DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS>+<.*>*}
+{<IN><DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*><CC>*<PRP|PRP$|WP|WP$|NN.*>+}
+{<IN><DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS.*>+ <IN>?}
+{<IN><DT>?<RB>*<JJ>*<LIST>+}
+}<,>{
+}<.>{
 NP:
 {<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS>+<.*>*}
 {<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*><CC>*<PRP|PRP$|WP|WP$|NN.*>+}
@@ -12,8 +19,6 @@ NP:
 }<RB>*<VB.*>{
 NRC:
 {<,><WDT><.*>*<,>}
-PP:
-{<IN><NP>}
 VP:
 {<RB>*<VB.*><.*>*}
 }<.>{
