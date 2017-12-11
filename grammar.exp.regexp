@@ -3,17 +3,19 @@ INF:
 LIST:
 {(<JJ>*<PRP|PRP$|WP|WP$|NN.*|JJ|RB><,>?)+(<CC><JJ>*<PRP|PRP$|WP|WP$|NN.*|JJ|RB>)}
 PP:
-{<IN><DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS>+<.*>*}
-{<IN><DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*><CC>*<PRP|PRP$|WP|WP$|NN.*>+}
-{<IN><DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS.*>+ <IN>?}
-{<IN><DT>?<RB>*<JJ>*<LIST>+}
+{<IN><DT>?<RB>*<JJ|JJS>*<LIST>+}
+{<IN><DT>?<RB>*<JJ|JJS>*<PRP|PRP$|WP|WP$|NN.*><CC>*<PRP|PRP$|WP|WP$|NN.*>+}
+{<IN><DT>?<RB>*<JJ|JJS>*<PRP|PRP$|WP|WP$|NN.*|LS.*>+}
+{<IN><DT>?<RB>*<JJ|JJS>*<PRP|PRP$|WP|WP$|NN.*|LS>+<.*>*}
 }<,>{
 }<.>{
+}<RB>*<VB.*>{
 NP:
-{<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS>+<.*>*}
-{<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*><CC>*<PRP|PRP$|WP|WP$|NN.*>+}
-{<DT>?<RB>*<JJ>*<PRP|PRP$|WP|WP$|NN.*|LS.*>+ <IN>?}
-{<DT>?<RB>*<JJ>*<LIST>+}
+{<DT>?<RB>*<JJ|JJS>*<LIST>+}
+{<DT>?<RB>*<JJ|JJS>*<PRP|PRP$|WP|WP$|NN.*>+<PP>+}
+{<DT>?<RB>*<JJ|JJS>*<PRP|PRP$|WP|WP$|NN.*><CC>*<PRP|PRP$|WP|WP$|NN.*>+}
+{<DT>?<RB>*<JJ|JJS>*<PRP|PRP$|WP|WP$|NN.*|LS.*>+}
+{<DT>?<RB>*<JJ|JJS>*<PRP|PRP$|WP|WP$|NN.*|LS>+<.*>*}
 }<,>{
 }<.>{
 }<RB>*<VB.*>{
@@ -22,3 +24,5 @@ NRC:
 VP:
 {<RB>*<VB.*><.*>*}
 }<.>{
+IDC:
+{<.*>*<,>}
