@@ -6,4 +6,3 @@ install:
     pip3 install progressbar2
     pip3 install markovify
     pip3 install grammar-check
-    
