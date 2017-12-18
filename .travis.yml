@@ -2,7 +2,7 @@ language: python
 python:
     "3.6"
 install:
-    pip3 install nltk
-    pip3 install progressbar2
-    pip3 install markovify
-    pip3 install grammar-check
+    pip install nltk
+    pip install progressbar2
+    pip install markovify
+    pip install grammar-check
